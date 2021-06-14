@@ -99,20 +99,15 @@ sensor_msgs::PointCloud2 cloud_to_cloud_msg(const Cloud& cloud, ns timestamp,
     return msg;
 }
 
-Cloud::Ptr pclcloud_to_pclcloud_msg(const Cloud& cloud,
-                                            const std::string& frame) {
+// Cloud::Ptr pclcloud_to_pclcloud_msg(const Cloud& cloud,
+//                                             const std::string& frame) {
 
-    Cloud::Ptr msg (new Cloud);
-    msg->header.frame_id = frame;
-    pcl_conversions::toPCL(ros::Time::now(), msg->header.stamp);
-    msg->points.push_back(cloud);
-    // msg->height = msg->width = 1;
-                                                
-    // Cloud msg{};
-    // pcl::toROSMsg(cloud, msg);
-    // msg.header.frame_id = frame;
-    return msg;
-}
+//     Cloud::Ptr msg (new Cloud);
+//     msg->header.frame_id = frame;
+//     pcl_conversions::toPCL(ros::Time::now(), msg->header.stamp);
+//     msg->points.push_back(cloud);
+//     return msg;
+// }
 
 geometry_msgs::TransformStamped transform_to_tf_msg(
     const ouster::mat4d& mat, const std::string& frame,

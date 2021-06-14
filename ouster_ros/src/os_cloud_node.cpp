@@ -9,7 +9,7 @@
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <tf2_ros/static_transform_broadcaster.h>
-#include <pcl_ros/point_cloud.h>
+// #include <pcl_ros/point_cloud.h>
 
 #include <algorithm>
 #include <chrono>
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
                 scan_to_cloud(xyz_lut, h->timestamp, ls, cloud);
                 lidar_pub.publish(ouster_ros::cloud_to_cloud_msg(
                     cloud, h->timestamp, sensor_frame));
-                pcl_pub.publish(ouster_ros::pclcloud_to_pclcloud_msg(cloud, sensor_frame));
+                // pcl_pub.publish(ouster_ros::pclcloud_to_pclcloud_msg(cloud, sensor_frame));
             }
         }
     };
