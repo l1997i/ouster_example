@@ -53,13 +53,13 @@ int main(int argc, char **argv) {
     out_path = node_handle.param("out_path", std::string{});
     mkdir(out_path.c_str(), 0777);
 
-    if (cloud_mode = "pcd") {
+    if (cloud_mode == "pcd") {
         pcd_path = out_path + "/pcd/";
         mkdir(pcd_path.c_str(), 0777);
         ros::Subscriber point_cloud_sub = 
             node_handle.subscribe("/os_cloud_node/points", 1, pcdSubscribePointCloud);
     }
-    else if (cloud_mode = "bin") {
+    else if (cloud_mode == "bin") {
         bin_path = out_path + "/bin/";
         mkdir(bin_path.c_str(), 0777);
         ros::Subscriber point_cloud_sub = 
