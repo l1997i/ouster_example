@@ -38,10 +38,10 @@ void binSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_messag
 
     for (int j = 0; j < cloud->size(); j++)
     {
-        binFile.write((char *)cloud->at(j).x, sizeof(cloud->at(j).x));
-        binFile.write((char *)cloud->at(j).y, sizeof(cloud->at(j).y));
-        binFile.write((char *)cloud->at(j).z, sizeof(cloud->at(j).z));
-        binFile.write((char *)cloud->at(j).intensity, sizeof(cloud->at(j).intensity));
+        binFile.write((char *)&cloud->at(j).x, sizeof(cloud->at(j).x));
+        binFile.write((char *)&cloud->at(j).y, sizeof(cloud->at(j).y));
+        binFile.write((char *)&cloud->at(j).z, sizeof(cloud->at(j).z));
+        binFile.write((char *)&cloud->at(j).intensity, sizeof(cloud->at(j).intensity));
     }
     binFile.close();
 }
