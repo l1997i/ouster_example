@@ -8,6 +8,8 @@
 static size_t counter = 0;
 std::string cloud_mode = "";
 std::string out_path = "";
+std::string pcd_path = "";
+std::string bin_path = "";
 
 pcl::PointCloud<pcl::PointXYZI> msgToPointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_message) {
     pcl::PointCloud<pcl::PointXYZI> point_cloud;
@@ -26,13 +28,15 @@ void pcdSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_messag
 }
 
 void binSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_message) {
+    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::PointCloud<pcl::PointXYZI> point_cloud = msgToPointCloud(lidar_message);
+    cloud = &point_cloud;
     counter++;
 
     std::string file_name = bin_path + std::to_string(counter) + ".bin";
     std::ofstream binFile(file_name.c_str(), std::ios::out | std::ios::binary);
 
-    for (int j = 0; j < cloud->size(); j++)
+    for (int j = 0; j < point_cloud->size(); j++)
     {
         binFile.write((char *)point_cloud->at(j).x, sizeof(point_cloud->at(j).x));
         binFile.write((char *)point_cloud->at(j).y, sizeof(point_cloud->at(j).y));
@@ -50,13 +54,13 @@ int main(int argc, char **argv) {
     mkdir(out_path.c_str(), 0777);
 
     if (cloud_mode = "pcd") {
-        std::string pcd_path = out_path + "/pcd/";
+        pcd_path = out_path + "/pcd/";
         mkdir(pcd_path.c_str(), 0777);
         ros::Subscriber point_cloud_sub = 
             node_handle.subscribe("/os_cloud_node/points", 1, pcdSubscribePointCloud);
     }
     else if (cloud_mode = "bin") {
-        std::string bin_path = out_path + "/bin/";
+        bin_path = out_path + "/bin/";
         mkdir(bin_path.c_str(), 0777);
         ros::Subscriber point_cloud_sub = 
             node_handle.subscribe("/os_cloud_node/points", 1, binSubscribePointCloud);
