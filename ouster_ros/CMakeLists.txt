@@ -79,6 +79,10 @@ add_executable(img_node src/img_node.cpp)
 target_link_libraries(img_node ouster_ros ${catkin_LIBRARIES})
 add_dependencies(img_node ${PROJECT_NAME}_gencpp)
 
+add_executable(out_node src/out_node.cpp)
+target_link_libraries(out_node ouster_ros ${catkin_LIBRARIES})
+add_dependencies(out_node ${PROJECT_NAME}_gencpp)
+
 # ==== Install ====
 install(
   TARGETS ouster_ros os_node os_cloud_node img_node
