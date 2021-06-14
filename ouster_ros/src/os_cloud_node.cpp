@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
                 lidar_pub.publish(ouster_ros::cloud_to_cloud_msg(
                     cloud, h->timestamp, sensor_frame));
                 pcl_pub.publish(ouster_ros::pclcloud_to_pclcloud_msg(
-                    cloud, h->timestamp, sensor_frame));
+                    cloud, sensor_frame));
             }
         }
     };
