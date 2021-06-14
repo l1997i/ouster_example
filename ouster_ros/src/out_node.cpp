@@ -30,13 +30,13 @@ void pcdSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_messag
 void binSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_message) {
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::PointCloud<pcl::PointXYZI> point_cloud = msgToPointCloud(lidar_message);
-    *cloud = createPointCloud(point_cloud);
+    cloud = point_cloud.makeShared;
     counter++;
 
     std::string file_name = bin_path + std::to_string(counter) + ".bin";
     std::ofstream binFile(file_name.c_str(), std::ios::out | std::ios::binary);
 
-    for (int j = 0; j < cloud->size(); j++)
+    for (unsigned int j = 0; j < cloud->size(); j++)
     {
         binFile.write((char *)&cloud->at(j).x, sizeof(cloud->at(j).x));
         binFile.write((char *)&cloud->at(j).y, sizeof(cloud->at(j).y));
