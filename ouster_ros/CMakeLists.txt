@@ -35,6 +35,9 @@ generate_messages(DEPENDENCIES std_msgs sensor_msgs geometry_msgs)
 set(_ouster_ros_INCLUDE_DIRS
   "include;../ouster_client/include;../ouster_client/include/optional-lite")
 
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 catkin_package(
   INCLUDE_DIRS
     ${_ouster_ros_INCLUDE_DIRS}
@@ -71,6 +74,10 @@ add_executable(os_node src/os_node.cpp)
 target_link_libraries(os_node ouster_ros ${catkin_LIBRARIES})
 add_dependencies(os_node ${PROJECT_NAME}_gencpp)
 
+add_executable(out_node src/out_node.cpp)
+target_link_libraries(out_node ouster_ros ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+add_dependencies(out_node ${PROJECT_NAME}_gencpp)
+
 add_executable(os_cloud_node src/os_cloud_node.cpp)
 target_link_libraries(os_cloud_node ouster_ros ${catkin_LIBRARIES})
 add_dependencies(os_cloud_node ${PROJECT_NAME}_gencpp)
@@ -78,10 +85,6 @@ add_dependencies(os_cloud_node ${PROJECT_NAME}_gencpp)
 add_executable(img_node src/img_node.cpp)
 target_link_libraries(img_node ouster_ros ${catkin_LIBRARIES})
 add_dependencies(img_node ${PROJECT_NAME}_gencpp)
-
-add_executable(out_node src/out_node.cpp)
-target_link_libraries(out_node ouster_ros ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-add_dependencies(out_node ${PROJECT_NAME}_gencpp)
 
 # ==== Install ====
 install(
