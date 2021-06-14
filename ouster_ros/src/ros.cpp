@@ -93,7 +93,7 @@ sensor_msgs::PointCloud2 cloud_to_cloud_msg(const Cloud& cloud, ns timestamp,
     pcl::toROSMsg(cloud, msg);
     msg.header.frame_id = frame;
     if (!timestamp.count()) {
-        ROS_INFO(timestamp.count());
+        ROS_INFO_STREAM(timestamp.count());
     }
     msg.header.stamp = ros::Time::now(); // msg.header.stamp.fromNSec(timestamp.count());
     return msg;
