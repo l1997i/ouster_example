@@ -6,8 +6,7 @@
 #include "sensor_msgs/PointCloud2.h"
 
 static size_t counter = 0;
-auto cloud_mode = nh.param("cloud_mode", std::string{});
-auto out_path = nh.param("out_path", std::string{});
+auto cloud_mode, out_path;
 
 pcl::PointCloud<pcl::PointXYZI> msgToPointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_message) {
     pcl::PointCloud<pcl::PointXYZI> point_cloud;
@@ -45,6 +44,8 @@ void binSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_messag
 int main(int argc, char **argv) {
     ros::init(argc, argv, "point_cloud_subscriber");
     ros::NodeHandle node_handle;
+    cloud_mode = node_handle.param("cloud_mode", std::string{});
+    out_path = node_handle.param("out_path", std::string{});
     mkdir(out_path.c_str(), 0777);
 
     if (cloud_mode = "pcd") {
