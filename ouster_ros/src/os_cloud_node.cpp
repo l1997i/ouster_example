@@ -9,6 +9,7 @@
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <tf2_ros/static_transform_broadcaster.h>
+#include <pcl_ros/point_cloud.h>
 
 #include <algorithm>
 #include <chrono>
