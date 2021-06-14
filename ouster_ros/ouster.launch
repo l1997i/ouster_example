@@ -31,8 +31,8 @@
   </node>
 
   <node if="$(arg out)" pkg="ouster_ros" type="out_node" name="out_node" output="screen" required="true">
-    <param name="~/cloud_mode" value="$(arg cloud_mode)"  required="true"/>
-    <param name="~/out_path" value="$(arg out_path)"  required="true"/>
+    <param name="~/cloud_mode" type="string" value="$(arg cloud_mode)"/>
+    <param name="~/out_path" type="string" value="$(arg out_path)"/>
   </node>
 
   <node if="$(arg viz)" pkg="rviz" name="rviz" type="rviz" args="$(arg rviz_config)" output="screen" required="true" />
