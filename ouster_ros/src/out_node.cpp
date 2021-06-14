@@ -6,7 +6,8 @@
 #include "sensor_msgs/PointCloud2.h"
 
 static size_t counter = 0;
-auto cloud_mode, out_path;
+std::string cloud_mode = "";
+std::string out_path = "";
 
 pcl::PointCloud<pcl::PointXYZI> msgToPointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_message) {
     pcl::PointCloud<pcl::PointXYZI> point_cloud;
