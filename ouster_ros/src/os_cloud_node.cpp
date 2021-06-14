@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 
     auto lidar_pub = nh.advertise<sensor_msgs::PointCloud2>("points", 10);
     auto imu_pub = nh.advertise<sensor_msgs::Imu>("imu", 100);
-    auto pcl_pub = nh.advertise<Cloud> ("pcl_points", 10);
+    // auto pcl_pub = nh.advertise<Cloud>("pcl_points", 10);
 
     auto xyz_lut = ouster::make_xyz_lut(info);
 
