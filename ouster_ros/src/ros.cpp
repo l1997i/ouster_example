@@ -99,10 +99,10 @@ sensor_msgs::PointCloud2 cloud_to_cloud_msg(const Cloud& cloud, ns timestamp,
     return msg;
 }
 
-PointCloud::Ptr pclcloud_to_pclcloud_msg(const Cloud& cloud,
+Cloud::Ptr pclcloud_to_pclcloud_msg(const Cloud& cloud,
                                             const std::string& frame) {
 
-    PointCloud::Ptr msg (cloud);
+    Cloud::Ptr msg (cloud);
     msg->header.frame_id = frame;
     pcl_conversions::toPCL(ros::Time::now(), msg->header.stamp);
     // msg->height = msg->width = 1;
