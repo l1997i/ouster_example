@@ -89,7 +89,7 @@ add_dependencies(img_node ${PROJECT_NAME}_gencpp)
 
 # ==== Install ====
 install(
-  TARGETS ouster_ros os_node os_cloud_node img_node
+  TARGETS ouster_ros os_node out_node os_cloud_node img_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
