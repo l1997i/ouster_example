@@ -59,7 +59,7 @@ add_subdirectory(../ouster_client ouster_client EXCLUDE_FROM_ALL)
 set(BUILD_SHARED_LIBS ${_SAVE_BUILD_SHARED_LIBS})
 
 # catkin adds all include dirs to a single variable, don't try to use targets
-include_directories(${_ouster_ros_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
+include_directories(${_ouster_ros_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS})
 
 add_library(ouster_ros src/ros.cpp)
 target_link_libraries(ouster_ros PUBLIC ${catkin_LIBRARIES} ouster_build pcl_common PRIVATE
@@ -80,7 +80,7 @@ target_link_libraries(img_node ouster_ros ${catkin_LIBRARIES})
 add_dependencies(img_node ${PROJECT_NAME}_gencpp)
 
 add_executable(out_node src/out_node.cpp)
-target_link_libraries(out_node ouster_ros ${catkin_LIBRARIES})
+target_link_libraries(out_node ouster_ros ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 add_dependencies(out_node ${PROJECT_NAME}_gencpp)
 
 # ==== Install ====
