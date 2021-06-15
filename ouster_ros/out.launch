@@ -1,0 +1,6 @@
+<launch>
+  <node if="$(arg out)" pkg="ouster_ros" type="out_node" name="out_node" output="screen" required="true">
+    <param name="cloud_mode" type="string" value="$(arg cloud_mode)"/>
+    <param name="out_path" type="string" value="$(arg out_path)"/>
+  </node>
+</launch>

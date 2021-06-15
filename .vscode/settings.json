@@ -74,5 +74,13 @@
         "utility": "cpp",
         "vector": "cpp",
         "filesystem": "cpp"
-    }
+    },
+    "python.autoComplete.extraPaths": [
+        "/root/myworkspce/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/root/myworkspce/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ]
 }
