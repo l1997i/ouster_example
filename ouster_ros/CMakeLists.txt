@@ -11,9 +11,11 @@ find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED COMPONENTS common)
 find_package(PCL REQUIRED)
 find_package(tf2_eigen REQUIRED)
+find_package(OpenCV REQUIRED)
 
 find_package(
   catkin REQUIRED
+  cv_bridge
   COMPONENTS message_generation
              std_msgs
              sensor_msgs
@@ -39,6 +41,9 @@ set(_ouster_ros_INCLUDE_DIRS
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
+link_directories(${OpenCV_LIBRARY_DIRS})
+add_definitions(${OpenCV_DEFINITIONS})
+
 catkin_package(
   INCLUDE_DIRS
     ${_ouster_ros_INCLUDE_DIRS}
@@ -50,6 +55,7 @@ catkin_package(
     std_msgs
     sensor_msgs
     geometry_msgs
+    cv_bridge
   DEPENDS
     EIGEN3)
 
@@ -63,7 +69,7 @@ add_subdirectory(../ouster_client ouster_client EXCLUDE_FROM_ALL)
 set(BUILD_SHARED_LIBS ${_SAVE_BUILD_SHARED_LIBS})
 
 # catkin adds all include dirs to a single variable, don't try to use targets
-include_directories(${_ouster_ros_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS})
+include_directories(${_ouster_ros_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 add_library(ouster_ros src/ros.cpp)
 target_link_libraries(ouster_ros PUBLIC ${catkin_LIBRARIES} ouster_build pcl_common PRIVATE
@@ -76,7 +82,7 @@ target_link_libraries(os_node ouster_ros ${catkin_LIBRARIES})
 add_dependencies(os_node ${PROJECT_NAME}_gencpp)
 
 add_executable(out_node src/out_node.cpp)
-target_link_libraries(out_node ouster_ros ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(out_node ouster_ros ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBS})
 add_dependencies(out_node ${PROJECT_NAME}_gencpp)
 
 add_executable(os_cloud_node src/os_cloud_node.cpp)

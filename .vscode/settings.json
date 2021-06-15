@@ -73,7 +73,22 @@
         "unordered_set": "cpp",
         "utility": "cpp",
         "vector": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "strstream": "cpp",
+        "*.tcc": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "shared_mutex": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp",
+        "*.ipp": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/root/myworkspce/devel/lib/python3/dist-packages",
