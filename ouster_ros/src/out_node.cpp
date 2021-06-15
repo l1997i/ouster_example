@@ -1,3 +1,5 @@
+#include <fstream>
+#include "boost/date_time/posix_time/posix_time.hpp"
 #include "pcl/io/pcd_io.h"
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
@@ -6,6 +8,7 @@
 #include "sensor_msgs/PointCloud2.h"
 
 static size_t counter = 0;
+std::ofstream binTS, pcdTS;
 std::string cloud_mode = "";
 std::string out_path = "";
 std::string pcd_path = "";
@@ -29,6 +32,10 @@ void pcdSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_messag
 }
 
 void binSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_message) {
+    boost::posix_time::ptime ts_posix_time = lidar_message->header.stamp.toBoost();
+    std::string ts = boost::posix_time::to_iso_extended_string(ts_posix_time);
+    // string ts = DateFormat('yyyy-MM-dd – kk:mm').format(lidar_message->header.stamp.toSec());
+    binTS << ts << std::endl;
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::PointCloud<pcl::PointXYZI> point_cloud = msgToPointCloud(lidar_message);
     cloud = point_cloud.makeShared();
@@ -62,17 +69,21 @@ int main(int argc, char **argv) {
         ROS_INFO_STREAM("Now [PCD] Mode...");
         pcd_path = out_path + "/pcd/";
         mkdir(pcd_path.c_str(), 0777);
+        pcdTS.open(pcd_path + "timestamp.txt");
         point_cloud_sub = 
-            node_handle.subscribe(lidar_topic, 1, pcdSubscribePointCloud);
+            node_handle.subscribe(lidar_topic, 1000, pcdSubscribePointCloud);
     }
     else if (cloud_mode == "bin") {
         ROS_INFO_STREAM("Now [BIN] Mode...");
         bin_path = out_path + "/bin/";
         mkdir(bin_path.c_str(), 0777);
+        binTS.open(bin_path + "timestamp.txt");
         point_cloud_sub = 
-            node_handle.subscribe(lidar_topic, 1, binSubscribePointCloud);
+            node_handle.subscribe(lidar_topic, 1000, binSubscribePointCloud);
     }
 
     ros::spin();
+    binTS.close();
+    pcdTS.close();
     return 0;
 }
