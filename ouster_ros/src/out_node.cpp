@@ -114,9 +114,9 @@ void binSubscribePointCloud_C(const sensor_msgs::PointCloud2ConstPtr& lidar_msg)
 
 void callback(const PointCloud2ConstPtr& lidar_msg, const ImageConstPtr& img_msg01, const ImageConstPtr& img_msg02)
 {
-    binSubscribePointCloud(lidar_msg);
     SubscribeImg(img_msg01, 1);
     SubscribeImg(img_msg02, 2);
+    binSubscribePointCloud(lidar_msg);
 }
 
 int main(int argc, char **argv) {
@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
     img01TS.open(image_01_path + "timestamp.txt");
     img02TS.open(image_02_path + "timestamp.txt");
 
-    Synchronizer<imgptsSyncPolicy> sync(imgptsSyncPolicy(10), point_cloud_sub, image_01_sub, image_02_sub);
+    Synchronizer<imgptsSyncPolicy> sync(imgptsSyncPolicy(QUEUE_SIZE), point_cloud_sub, image_01_sub, image_02_sub);
     sync.registerCallback(boost::bind(&callback, _1, _2, _3));
 
     ros::spin();
