@@ -21,7 +21,9 @@ using namespace message_filters;
 using namespace std;
 
 
-static size_t counter = 0;
+static size_t counter_img01 = 0;
+static size_t counter_img02 = 0;
+static size_t counter_bin = 0;
 ofstream binTS, pcdTS, img01TS, img02TS;
 string cloud_mode;
 string out_path, pcd_path, bin_path, image_01_path, image_02_path;
@@ -40,41 +42,43 @@ void SubscribeImg(const sensor_msgs::ImageConstPtr &img_msg, int camID) {
     cv_bridge::CvImageConstPtr ptr;
 
     if (camID == 1) {  // image_01_topic = "/multisense/right/image_rect"
-        filename = image_01_path + to_string(counter) + ".png";
+        filename = image_01_path + to_string(counter_img01) + ".png";
         img01TS << ts << endl;
         ptr = cv_bridge::toCvCopy(img_msg, "mono8");
+        counter_img01++;
     }
     else if (camID == 2) {  // image_02_topic = "/multisense/left/image_rect_color"
-        filename = image_02_path + to_string(counter) + ".png";
+        filename = image_02_path + to_string(counter_img02) + ".png";
         img02TS << ts << endl;
         ptr = cv_bridge::toCvCopy(img_msg, "bgr8");
+        counter_img02++;
     }
 
     cv::Mat img = ptr->image;
     cv::imwrite(filename, img);
 }
 
-void pcdSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
-    pcl::PointCloud<pcl::PointXYZI> point_cloud = msgToPointCloud(lidar_msg);
-    counter++;
+// void pcdSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
+//     pcl::PointCloud<pcl::PointXYZI> point_cloud = msgToPointCloud(lidar_msg);
+//     counter++;
     
-    string file_name = pcd_path + to_string(counter) + ".pcd";
-    ROS_INFO_STREAM(file_name);
-    pcl::io::savePCDFile(file_name, point_cloud);
+//     string file_name = pcd_path + to_string(counter) + ".pcd";
+//     ROS_INFO_STREAM(file_name);
+//     pcl::io::savePCDFile(file_name, point_cloud);
     
-}
+// }
 
 void binSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
+    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
+    pcl::PointCloud<pcl::PointXYZI> point_cloud = msgToPointCloud(lidar_msg);
     const int32_t PT_SIZE = 4; // sizeof(cloud->at(j).{x .. intensity})
     boost::posix_time::ptime ts_posix_time = lidar_msg->header.stamp.toBoost();
     string ts = boost::posix_time::to_iso_extended_string(ts_posix_time);
     binTS << ts << endl;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
-    pcl::PointCloud<pcl::PointXYZI> point_cloud = msgToPointCloud(lidar_msg);
-    cloud = point_cloud.makeShared();
-    counter++;
 
-    string file_name = bin_path + to_string(counter) + ".bin";
+    cloud = point_cloud.makeShared();
+
+    string file_name = bin_path + to_string(counter_bin) + ".bin";
     ofstream binFile(file_name.c_str(), ios::out | ios::binary);
     ROS_INFO_STREAM(file_name);
 
@@ -85,42 +89,45 @@ void binSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
         binFile.write((char *)&cloud->at(j).z, PT_SIZE);
         binFile.write((char *)&cloud->at(j).intensity, PT_SIZE);
     }
+
+    counter_bin++;
     binFile.close();
+    
 }
 
-void binSubscribePointCloud_C(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
-    const int32_t PT_SIZE = 4; // sizeof(cloud->at(j).{x .. intensity})
-    boost::posix_time::ptime ts_posix_time = lidar_msg->header.stamp.toBoost();
-    string ts = boost::posix_time::to_iso_extended_string(ts_posix_time);
-    binTS << ts << endl;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
-    pcl::PointCloud<pcl::PointXYZI> point_cloud = msgToPointCloud(lidar_msg);
-    cloud = point_cloud.makeShared();
-    counter++;
+// void binSubscribePointCloud_C(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
+//     const int32_t PT_SIZE = 4; // sizeof(cloud->at(j).{x .. intensity})
+//     boost::posix_time::ptime ts_posix_time = lidar_msg->header.stamp.toBoost();
+//     string ts = boost::posix_time::to_iso_extended_string(ts_posix_time);
+//     binTS << ts << endl;
+//     pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
+//     pcl::PointCloud<pcl::PointXYZI> point_cloud = msgToPointCloud(lidar_msg);
+//     cloud = point_cloud.makeShared();
+//     counter++;
 
-    string file_name = bin_path + to_string(counter) + ".bin";
-    FILE* binFile = fopen(file_name.c_str(), "wb");
-    ROS_INFO_STREAM(file_name);
+//     string file_name = bin_path + to_string(counter) + ".bin";
+//     FILE* binFile = fopen(file_name.c_str(), "wb");
+//     ROS_INFO_STREAM(file_name);
 
-    for (unsigned int j = 0; j < cloud->size(); j++)
-    {
-        fwrite((char *)&cloud->at(j).x, 1, PT_SIZE, binFile);
-        fwrite((char *)&cloud->at(j).y, 1, PT_SIZE, binFile);
-        fwrite((char *)&cloud->at(j).z, 1, PT_SIZE, binFile);
-        fwrite((char *)&cloud->at(j).intensity, 1, PT_SIZE, binFile);
-    }
-    fclose(binFile);
-}
+//     for (unsigned int j = 0; j < cloud->size(); j++)
+//     {
+//         fwrite((char *)&cloud->at(j).x, 1, PT_SIZE, binFile);
+//         fwrite((char *)&cloud->at(j).y, 1, PT_SIZE, binFile);
+//         fwrite((char *)&cloud->at(j).z, 1, PT_SIZE, binFile);
+//         fwrite((char *)&cloud->at(j).intensity, 1, PT_SIZE, binFile);
+//     }
+//     fclose(binFile);
+// }
 
 void callback(const PointCloud2ConstPtr& lidar_msg, const ImageConstPtr& img_msg01, const ImageConstPtr& img_msg02)
 {
+    binSubscribePointCloud(lidar_msg);
     SubscribeImg(img_msg01, 1);
     SubscribeImg(img_msg02, 2);
-    binSubscribePointCloud(lidar_msg);
 }
 
 int main(int argc, char **argv) {
-    const int32_t QUEUE_SIZE = 100;
+    const int32_t QUEUE_SIZE = 1000;
     string lidar_topic = "/os_cloud_node/points";
     string image_01_topic = "/multisense/right/image_rect";
     string image_02_topic = "/multisense/left/image_rect_color";
