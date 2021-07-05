@@ -23,10 +23,13 @@ using namespace std;
 
 static size_t counter_img01 = 0;
 static size_t counter_img02 = 0;
+int counter_ambient = 0;
+int counter_reflec = 0;
 static size_t counter_bin = 0;
-ofstream binTS, pcdTS, img01TS, img02TS;
+ofstream binTS, pcdTS, img01TS, img02TS, ambientTS, reflecTS;
 string cloud_mode;
 string out_path, pcd_path, bin_path, image_01_path, image_02_path;
+string ambient_path, reflec_path;
 
 pcl::PointCloud<pcl::PointXYZI> msgToPointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_message) {
     pcl::PointCloud<pcl::PointXYZI> point_cloud;
@@ -53,6 +56,21 @@ void SubscribeImg(const sensor_msgs::ImageConstPtr &img_msg, int camID) {
         ptr = cv_bridge::toCvCopy(img_msg, "bgr8");
         counter_img02++;
     }
+
+    cv::Mat img = ptr->image;
+    cv::imwrite(filename, img);
+}
+
+void SubscribeImgNode(const sensor_msgs::ImageConstPtr &img_msg, string out_dir, int &counter, ofstream &tsStream) {
+    boost::posix_time::ptime ts_posix_time = img_msg->header.stamp.toBoost();
+    string ts = boost::posix_time::to_iso_extended_string(ts_posix_time);
+    string filename;
+    cv_bridge::CvImageConstPtr ptr;
+
+    filename = out_dir + to_string(counter) + ".png";
+    tsStream << ts << endl;
+    ptr = cv_bridge::toCvCopy(img_msg, "mono8");
+    counter++;
 
     cv::Mat img = ptr->image;
     cv::imwrite(filename, img);
@@ -119,18 +137,23 @@ void binSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
 //     fclose(binFile);
 // }
 
-void callback(const PointCloud2ConstPtr& lidar_msg, const ImageConstPtr& img_msg01, const ImageConstPtr& img_msg02)
+void callback(const PointCloud2ConstPtr& lidar_msg, const ImageConstPtr& img_msg01, const ImageConstPtr& img_msg02, const ImageConstPtr& ambient_msg, const ImageConstPtr& reflec_msg)
 {
     binSubscribePointCloud(lidar_msg);
     SubscribeImg(img_msg01, 1);
     SubscribeImg(img_msg02, 2);
+    SubscribeImgNode(ambient_msg, ambient_path, counter_ambient, ambientTS);
+    SubscribeImgNode(reflec_msg, reflec_path, counter_reflec, reflecTS);
 }
 
 int main(int argc, char **argv) {
+    // roslaunch ouster_ros out.launch  metadata:=/root/new/packets_0622/os1.json out:=true cloud_mode:="bin" out_path:=/root/out
     const int32_t QUEUE_SIZE = 1000;
     string lidar_topic = "/os_cloud_node/points";
     string image_01_topic = "/multisense/right/image_rect";
     string image_02_topic = "/multisense/left/image_rect_color";
+    string ambient_topic = "/img_node/nearir_image";
+    string reflec_topic = "/img_node/reflec_image";
     ros::init(argc, argv, "point_cloud_subscriber");
     ros::NodeHandle node_handle;
     cloud_mode = node_handle.param("/out_node/cloud_mode", string{});
@@ -140,14 +163,18 @@ int main(int argc, char **argv) {
     out_path = base_path + "/" + dir_name;
     image_01_path = out_path + "/image_01/";
     image_02_path = out_path + "/image_02/";
+    ambient_path = out_path + "/ambient/";
+    reflec_path = out_path + "/reflec/";
     mkdir(base_path.c_str(), 0777);
     mkdir(out_path.c_str(), 0777);
     mkdir(image_01_path.c_str(), 0777);
     mkdir(image_02_path.c_str(), 0777);
+    mkdir(ambient_path.c_str(), 0777);
+    mkdir(reflec_path.c_str(), 0777);
 
     Subscriber<PointCloud2> point_cloud_sub;
-    Subscriber<Image> image_01_sub, image_02_sub;
-    typedef sync_policies::ApproximateTime<PointCloud2, Image, Image> imgptsSyncPolicy;
+    Subscriber<Image> image_01_sub, image_02_sub, ambient_sub, reflec_sub;
+    typedef sync_policies::ApproximateTime<PointCloud2, Image, Image, Image, Image> imgptsSyncPolicy;
 
     if (cloud_mode == "pcd") {
         ROS_INFO_STREAM("Now [PCD] Mode...");
@@ -165,17 +192,23 @@ int main(int argc, char **argv) {
     point_cloud_sub.subscribe(node_handle, lidar_topic, QUEUE_SIZE);
     image_01_sub.subscribe(node_handle, image_01_topic, QUEUE_SIZE);
     image_02_sub.subscribe(node_handle, image_02_topic, QUEUE_SIZE);
+    ambient_sub.subscribe(node_handle, ambient_topic, QUEUE_SIZE);
+    reflec_sub.subscribe(node_handle, reflec_topic, QUEUE_SIZE);
 
     img01TS.open(image_01_path + "timestamp.txt");
     img02TS.open(image_02_path + "timestamp.txt");
+    ambientTS.open(ambient_path + "timestamp.txt");
+    reflecTS.open(reflec_path + "timestamp.txt");
 
-    Synchronizer<imgptsSyncPolicy> sync(imgptsSyncPolicy(QUEUE_SIZE), point_cloud_sub, image_01_sub, image_02_sub);
-    sync.registerCallback(boost::bind(&callback, _1, _2, _3));
+    Synchronizer<imgptsSyncPolicy> sync(imgptsSyncPolicy(QUEUE_SIZE), point_cloud_sub, image_01_sub, image_02_sub, ambient_sub, reflec_sub);
+    sync.registerCallback(boost::bind(&callback, _1, _2, _3, _4, _5));
 
     ros::spin();
     binTS.close();
     pcdTS.close();
     img01TS.close();
     img02TS.close();
+    ambientTS.close();
+    reflecTS.close();
     return 0;
 }

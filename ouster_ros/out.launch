@@ -1,6 +1,12 @@
 <launch>
+  <arg name="metadata" default="" doc="override default metadata file for replays"/>
+  
   <node if="$(arg out)" pkg="ouster_ros" type="out_node" name="out_node" output="screen" required="true">
     <param name="cloud_mode" type="string" value="$(arg cloud_mode)"/>
     <param name="out_path" type="string" value="$(arg out_path)"/>
+  </node>
+  <node if="$(arg img)" pkg="ouster_ros" name="img_node" type="img_node" required="true">
+    <remap from="~/os_config" to="/os_node/os_config"/>
+    <remap from="~/points" to="/os_cloud_node/points"/>
   </node>
 </launch>
