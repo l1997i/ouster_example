@@ -1,4 +1,6 @@
 #include <fstream>
+#include <iostream>
+#include <iomanip>
 #include <stdio.h>
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "ros/ros.h"
@@ -45,13 +47,17 @@ void SubscribeImg(const sensor_msgs::ImageConstPtr &img_msg, int camID) {
     cv_bridge::CvImageConstPtr ptr;
 
     if (camID == 1) {  // image_01_topic = "/multisense/right/image_rect"
-        filename = image_01_path + to_string(counter_img01) + ".png";
+        stringstream counterStream01;
+        counterStream01 << setw(10) << setfill('0') << to_string(counter_img01);
+        filename = image_01_path + counterStream01.str() + ".png";
         img01TS << ts << endl;
         ptr = cv_bridge::toCvCopy(img_msg, "mono8");
         counter_img01++;
     }
     else if (camID == 2) {  // image_02_topic = "/multisense/left/image_rect_color"
-        filename = image_02_path + to_string(counter_img02) + ".png";
+        stringstream counterStream02;
+        counterStream02 << setw(10) << setfill('0') << to_string(counter_img02);
+        filename = image_02_path + counterStream02.str() + ".png";
         img02TS << ts << endl;
         ptr = cv_bridge::toCvCopy(img_msg, "bgr8");
         counter_img02++;
@@ -67,9 +73,12 @@ void SubscribeImgNode(const sensor_msgs::ImageConstPtr &img_msg, string out_dir,
     string filename;
     cv_bridge::CvImageConstPtr ptr;
 
-    filename = out_dir + to_string(counter) + ".png";
+    stringstream counterStream;
+    counterStream << setw(10) << setfill('0') << to_string(counter);
+
+    filename = out_dir + counterStream.str() + ".png";
     tsStream << ts << endl;
-    ptr = cv_bridge::toCvCopy(img_msg, "mono8");
+    ptr = cv_bridge::toCvCopy(img_msg, "mono16");
     counter++;
 
     cv::Mat img = ptr->image;
@@ -96,7 +105,9 @@ void binSubscribePointCloud(const sensor_msgs::PointCloud2ConstPtr& lidar_msg) {
 
     cloud = point_cloud.makeShared();
 
-    string file_name = bin_path + to_string(counter_bin) + ".bin";
+    stringstream counterStream;
+    counterStream << setw(10) << setfill('0') << to_string(counter_bin);
+    string file_name = bin_path + counterStream.str() + ".bin";
     ofstream binFile(file_name.c_str(), ios::out | ios::binary);
     ROS_INFO_STREAM(file_name);
 
